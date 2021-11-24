@@ -1,4 +1,2 @@
-require('./vendor.js');
-require('../assets/js/custom.js');
-
-
+import "./vendor.js";
+import "../assets/js/custom.js";
