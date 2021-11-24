@@ -32,3 +32,5 @@ lerna-debug.log*
 
 # EVNs
 environments/.env.development
+
+/dist/
