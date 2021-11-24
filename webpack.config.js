@@ -1,7 +1,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-var webpack = require("webpack");
+const MergeIntoSingleFilePlugin = require('webpack-merge-and-include-globally');
 
 module.exports = {
   mode: process.env.NODE_EVN === "production" ? "production" : "development",
@@ -13,12 +13,6 @@ module.exports = {
       path.resolve(__dirname, "assets/css/animated.css"),
       path.resolve(__dirname, "assets/scss/owl.scss"),
     ],
-    // "app.js": [path.resolve(__dirname, "src/app.js")],
-    "app.js": {
-      import: path.resolve(__dirname, "src/app.js"),
-      dependOn: "jquery",
-    },
-    jquery: [path.resolve(__dirname, "vendor/jquery/jquery.min.js")],
   },
   output: {
     filename: "[name]",
@@ -27,44 +21,9 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env"],
-          },
-        },
-      },
-      {
         test: /.s?css$/,
         use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
-      //   {
-      //     test: /\.css$/,
-      //     use: [
-      //       {
-      //         loader: "style-loader",
-      //       },
-      //       {
-      //         loader: "css-loader",
-      //         options: {
-      //           sourceMap: true,
-      //         },
-      //       },
-      //     ],
-      //   },
-      //   {
-      //     test: /\.scss$/,
-      //     use: [
-      //       // fallback to style-loader in development
-      //       process.env.NODE_ENV !== "production"
-      //         ? "style-loader"
-      //         : MiniCssExtractPlugin.loader,
-      //       "css-loader",
-      //       "sass-loader",
-      //     ],
-      //   },
     ],
   },
   optimization: {
@@ -77,6 +36,23 @@ module.exports = {
   plugins: [
     new MiniCssExtractPlugin({
       filename: "style.css",
+    }),
+    new MergeIntoSingleFilePlugin({
+      files: {
+        "app.js": [
+          path.resolve(__dirname, "vendor/jquery/jquery.js"),
+          path.resolve(__dirname, "vendor/bootstrap/js/bootstrap.bundle.min.js"),
+          path.resolve(__dirname, "assets/js/owl-carousel.js"),
+          path.resolve(__dirname, "assets/js/animation.js"),
+          path.resolve(__dirname, "assets/js/imagesloaded.js"),
+          path.resolve(__dirname, "assets/js/custom.js"),
+        ]
+      },
+      transform: {
+        'app.js': code => require("uglify-js").minify(code, {
+          sourceMap: process.env.NODE_EVN === "development"
+        }).code
+      }
     }),
   ],
   // devtool: this.mode === "development" ? "eval-source-map" : "eval",
