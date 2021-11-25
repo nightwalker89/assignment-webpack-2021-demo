@@ -43,6 +43,6 @@ module.exports = {
   ],
   // devtool: this.mode === "development" ? "eval-source-map" : "eval",
 };
-if (process.env.NODE_EVN === "development") {
+if (process.env.NODE_ENV === "development") {
   module.exports.devtool = "source-map";
 }
