@@ -1,24 +1,27 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const MergeIntoSingleFilePlugin = require('webpack-merge-and-include-globally');
+const webpack = require("webpack");
 
 module.exports = {
   mode: process.env.NODE_ENV === "production" ? "production" : "development",
-  entry:
-    [
+  entry: {
+    app: [
+      path.resolve(__dirname, "src/app.js"),
       path.resolve(__dirname, "assets/scss/style.scss"),
-    ]
-  ,
+    ],
+  },
   output: {
-    filename: "[name]",
+    filename: "[name].js",
     path: path.resolve(__dirname, "dist"),
   },
   module: {
-    rules: [{
-      test: /\.(scss|css)$/,
-      use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"]
-    }]
+    rules: [
+      {
+        test: /\.(scss|css)$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+      },
+    ],
   },
   optimization: {
     minimize: process.env.NODE_ENV === "production",
@@ -29,25 +32,13 @@ module.exports = {
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: 'style.css'
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery",
     }),
-    new MergeIntoSingleFilePlugin({
-      files: {
-        "app.js": [
-          path.resolve(__dirname, "vendor/jquery/jquery.js"),
-          path.resolve(__dirname, "vendor/bootstrap/js/bootstrap.bundle.min.js"),
-          path.resolve(__dirname, "assets/js/owl-carousel.js"),
-          path.resolve(__dirname, "assets/js/animation.js"),
-          path.resolve(__dirname, "assets/js/imagesloaded.js"),
-          path.resolve(__dirname, "assets/js/custom.js"),
-        ]
-      },
-      transform: {
-        'app.js': code => require("uglify-js").minify(code, {
-          sourceMap: process.env.NODE_EVN === "development"
-        }).code
-      }
+    new MiniCssExtractPlugin({
+      filename: "style.css",
     }),
   ],
   // devtool: this.mode === "development" ? "eval-source-map" : "eval",
